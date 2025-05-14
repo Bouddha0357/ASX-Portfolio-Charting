@@ -31,15 +31,17 @@ st.write("Cleaned Data (Last 90 Days):", data_cleaned.head())  # Display cleaned
 fig = go.Figure()
 
 # Closing Price
-fig.add_trace(go.Scatter(x=data_cleaned.index, y=data_cleaned["Close"], mode='lines', name="Closing Price", line=dict(color="lightblue")))
+fig.add_trace(go.Scatter(x=data_cleaned.index, y=data_cleaned["Close"], mode='lines', name="Closing Price", line=dict(color="lightblue", width=2)))
 
 # Layout
 fig.update_layout(
     template="plotly_dark",
     title="Telstra (TLS.AX) - Closing Price (Last 90 Days)",
-    xaxis=dict(title="Date"),
+    xaxis=dict(title="Date", tickformat="%Y-%m-%d"),  # Format the x-axis to show dates clearly
     yaxis=dict(title="Closing Price (AUD)"),
-    legend=dict(x=0, y=1.2, orientation="h")
+    legend=dict(x=0, y=1.2, orientation="h"),
+    plot_bgcolor="rgba(0,0,0,0)",  # Transparent background for the chart
+    margin=dict(t=40, b=40, l=40, r=40),  # Adjust margins for better spacing
 )
 
 # -----------------------------
