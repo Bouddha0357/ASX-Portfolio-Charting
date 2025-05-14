@@ -29,5 +29,10 @@ if data_cleaned.empty or 'Close' not in data_cleaned.columns:
     st.warning(f"No valid price data returned for {ticker}. It may be unavailable on Yahoo Finance.")
     st.stop()
 
-# Display the cleaned data with MA20, MA50, and ((MA20 - MA50) / Closing Price) * 100 as a table
+# Format the last column as percentage
+data_cleaned = data_cleaned.style.format({
+    'MA20 - MA50 / Close (%)': '{:.2f}%'  # Format the percentage to 2 decimal places
+})
+
+# Display the cleaned data with formatted percentage column
 st.write("Telstra Closing Prices, MA20, MA50, and ((MA20 - MA50) / Closing Price) (%) (Last 180 Days):", data_cleaned)
