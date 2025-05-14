@@ -37,9 +37,12 @@ if 'Close' in data.columns:
     data['MA20'] = data['Close'].rolling(window=20).mean()
     data['MA50'] = data['Close'].rolling(window=50).mean()
 
-    # Drop rows until MA50 is available
-    data = data.dropna(subset=['MA20', 'MA50', 'Close'])
+    # Only keep rows where all necessary columns are present
+    valid_cols = ['MA20', 'MA50']
+    available_cols = [col for col in valid_cols if col in data.columns]
+    data = data.dropna(subset=available_cols)
 
+    # Now compute SpreadPct safely
     data['SpreadPct'] = ((data['MA20'] - data['MA50']) / data['Close']) * 100
 
     # -----------------------------
