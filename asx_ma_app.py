@@ -5,7 +5,7 @@ import pandas as pd
 # -----------------------------
 # Config
 st.set_page_config(page_title="Telstra Closing Price, MA20 & MA50 Table", layout="wide", page_icon="📈")
-st.title("📈 Telstra (TLS.AX) - Closing Price, MA20 & MA50 for the Last 180 Days")
+st.title("📈 Telstra (DRO.AX) - Closing Price, MA20 & MA50 for the Last 180 Days")
 st.markdown("""
 This app displays the closing price, the 20-day moving average (MA20), the 50-day moving average (MA50), and the difference (MA20 - MA50) divided by the closing price of Telstra (TLS.AX) for the last 180 trading days in a table format.
 """)
