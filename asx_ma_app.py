@@ -31,3 +31,8 @@ if data_cleaned.empty or 'Close' not in data_cleaned.columns:
 
 # Display the cleaned data with MA20, MA50, and MA20 - MA50 as a table
 st.write("Telstra Closing Prices, MA20, MA50, and (MA20 - MA50) (Last 180 Days):", data_cleaned)
+
+# -----------------------------
+# Line Chart: Close Price from Day 50 Onward
+st.subheader("📉 Telstra Closing Price (from Day 50 onward)")
+st.line_chart(data_cleaned['Close'].iloc[50:])
