@@ -21,8 +21,8 @@ data_cleaned['MA20'] = data_cleaned['Close'].rolling(window=20).mean()  # Calcul
 data_cleaned['MA50'] = data_cleaned['Close'].rolling(window=50).mean()  # Calculate MA50
 
 # Calculate (MA20 - MA50) / Closing Price, and set the first 50 rows to NaN (since MA50 starts at day 50)
-data_cleaned['MA20 - MA50 / Close'] = (data_cleaned['MA20'] - data_cleaned['MA50']) / data_cleaned['Close']
-data_cleaned['MA20 - MA50 / Close'][:50] = pd.NA  # Set the first 50 rows to NaN
+data_cleaned['Spread %'] = (data_cleaned['MA20'] - data_cleaned['MA50']) / data_cleaned['Close']
+data_cleaned['Spread %'][:50] = pd.NA  # Set the first 50 rows to NaN (since MA50 is not available for the first 50 days)
 
 # Check if data is fetched and contains 'Close'
 if data_cleaned.empty or 'Close' not in data_cleaned.columns:
