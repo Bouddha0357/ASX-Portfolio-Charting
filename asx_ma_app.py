@@ -41,10 +41,13 @@ if data.empty or 'Close' not in data.columns:
 data['MA20'] = data['Close'].rolling(window=20).mean()
 data['MA50'] = data['Close'].rolling(window=50).mean()
 
-# Check if required columns exist after calculations
-if 'MA20' in data.columns and 'MA50' in data.columns and 'Close' in data.columns:
-    # Drop rows where any required column is NaN
-    data = data.dropna(subset=['MA20', 'MA50', 'Close'])
+# Check if the required columns exist after calculations
+required_columns = ['MA20', 'MA50', 'Close']
+
+# Ensure all required columns are present before proceeding
+if all(col in data.columns for col in required_columns):
+    # Drop rows where any of the required columns have NaN values
+    data = data.dropna(subset=required_columns)
 
     # Compute SpreadPct
     data['SpreadPct'] = ((data['MA20'] - data['MA50']) / data['Close']) * 100
@@ -77,4 +80,4 @@ if 'MA20' in data.columns and 'MA50' in data.columns and 'Close' in data.columns
     # Display Chart
     st.plotly_chart(fig, use_container_width=True)
 else:
-    st.error("One or more required columns (MA20, MA50, Close) are missing or incomplete.")
+    st.error(f"One or more of the required columns are missing: {', '.join(required_columns)}")
