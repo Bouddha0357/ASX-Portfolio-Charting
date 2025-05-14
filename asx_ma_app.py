@@ -35,10 +35,9 @@ data = data.tail(90 + 50)  # Ensure room for MA50 to appear
 # Calculations
 data['MA20'] = data['Close'].rolling(window=20).mean()
 data['MA50'] = data['Close'].rolling(window=50).mean()
+data = data.dropna(subset=['MA50'])  # Ensure MA50 exists (and by then MA20 does too)
 data['SpreadPct'] = ((data['MA20'] - data['MA50']) / data['Close']) * 100
 
-# Drop rows until MA50 is available
-data = data.dropna(subset=['MA50'])
 
 # -----------------------------
 # Plotly Chart
