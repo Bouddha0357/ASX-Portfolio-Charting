@@ -46,25 +46,25 @@ required_columns = ['MA20', 'MA50', 'Close']
 
 # Ensure all required columns are present before proceeding
 if all(col in data.columns for col in required_columns):
-    # Drop rows where any of the required columns have NaN values
-    data = data.dropna(subset=required_columns)
+    # Drop rows where any of the required columns have NaN values only if they are NaN
+    data_clean = data.dropna(subset=required_columns, how='any')
 
     # Compute SpreadPct
-    data['SpreadPct'] = ((data['MA20'] - data['MA50']) / data['Close']) * 100
+    data_clean['SpreadPct'] = ((data_clean['MA20'] - data_clean['MA50']) / data_clean['Close']) * 100
 
     # -----------------------------
     # Plotly Chart
     fig = go.Figure()
 
     # Price
-    fig.add_trace(go.Scatter(x=data.index, y=data['Close'], mode='lines', name='Price', line=dict(color='lightblue')))
+    fig.add_trace(go.Scatter(x=data_clean.index, y=data_clean['Close'], mode='lines', name='Price', line=dict(color='lightblue')))
 
     # MA20 & MA50
-    fig.add_trace(go.Scatter(x=data.index, y=data['MA20'], mode='lines', name='MA20', line=dict(color='orange')))
-    fig.add_trace(go.Scatter(x=data.index, y=data['MA50'], mode='lines', name='MA50', line=dict(color='green')))
+    fig.add_trace(go.Scatter(x=data_clean.index, y=data_clean['MA20'], mode='lines', name='MA20', line=dict(color='orange')))
+    fig.add_trace(go.Scatter(x=data_clean.index, y=data_clean['MA50'], mode='lines', name='MA50', line=dict(color='green')))
 
     # Spread % on secondary y-axis
-    fig.add_trace(go.Scatter(x=data.index, y=data['SpreadPct'], mode='lines', name='Spread % (MA20 - MA50)', yaxis='y2', line=dict(color='red', dash='dot')))
+    fig.add_trace(go.Scatter(x=data_clean.index, y=data_clean['SpreadPct'], mode='lines', name='Spread % (MA20 - MA50)', yaxis='y2', line=dict(color='red', dash='dot')))
 
     # Layout
     fig.update_layout(
