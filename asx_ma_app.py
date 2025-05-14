@@ -30,14 +30,21 @@ data = yf.download(ticker, period="9mo")  # Ensure enough data for 180 days
 
 # -----------------------------
 # Calculations
-if 'Close' in data.columns:
+required_cols = ['Close']
+if all(col in data.columns for col in required_cols):
     data['MA20'] = data['Close'].rolling(window=20).mean()
     data['MA50'] = data['Close'].rolling(window=50).mean()
 
-    # Keep only rows where all three columns have data
-    data = data.dropna(subset=['Close', 'MA20', 'MA50'])
+    # Determine available columns and drop rows only where all exist
+    available_cols = ['Close']
+    if 'MA20' in data.columns:
+        available_cols.append('MA20')
+    if 'MA50' in data.columns:
+        available_cols.append('MA50')
 
-    if not data.empty:
+    data = data.dropna(subset=available_cols)
+
+    if not data.empty and all(col in data.columns for col in ['Close', 'MA20', 'MA50']):
         # -----------------------------
         # Display Table
         st.subheader(f"{selected_label} - Closing Price, MA20 & MA50 (Last 180 Days)")
