@@ -15,8 +15,11 @@ This app displays the closing price of Telstra (TLS.AX) for the last 90 trading 
 ticker = "TLS.AX"
 data = yf.download(ticker, period="90d")  # Fetch the past 90 days of data
 
-# Debugging: Check if data is fetched correctly
+# Check if data is fetched correctly and display first few rows for debugging
 st.write("Fetched data:", data.head())  # Display first few rows for debugging
+
+# Clean up data: Keep only the "Close" column and drop other unnecessary columns
+data = data[['Close']]  # Keep only the "Close" column
 
 # Check if data is available and contains 'Close' column
 if data.empty or 'Close' not in data.columns:
