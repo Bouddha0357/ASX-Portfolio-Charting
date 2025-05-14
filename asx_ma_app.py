@@ -4,36 +4,42 @@ import pandas as pd
 
 # -----------------------------
 # Config
-st.set_page_config(page_title="Telstra Closing Price, MA20 & MA50 Table", layout="wide", page_icon="📈")
-st.title("📈 Telstra (TLS.AX) - Closing Price, MA20, MA50 & Spread for the Last 90 Days")
+st.set_page_config(page_title="ASX Stock MA Viewer", layout="wide", page_icon="📈")
+st.title("📈 ASX Stock MA Analysis")
 st.markdown("""
-This app displays the closing price, the 20-day moving average (MA20), the 50-day moving average (MA50), and the spread between MA20 and MA50 as a percentage of the closing price for Telstra (TLS.AX) over the last 90 trading days.
+This app shows the last 180 trading days of a selected ASX stock with:
+- Closing Price
+- MA20 & MA50
 """)
 
 # -----------------------------
+# Dropdown
+stock_map = {
+    "Telstra (TLS)": "TLS.AX",
+    "BBOZ": "BBOZ.AX",
+    "Appen (APX)": "APX.AX",
+    "DroneShield (DRO)": "DRO.AX"
+}
+
+selected_label = st.selectbox("Select ASX Stock:", list(stock_map.keys()))
+ticker = stock_map[selected_label]
+
+# -----------------------------
 # Data Fetching
-ticker = "TLS.AX"
-data = yf.download(ticker, period="90d")  # Fetch the past 90 days of data
+data = yf.download(ticker, period="9mo")  # Ensure enough data for 180 days
 
-# Clean up: Retain only 'Close' column and compute MA20, MA50, and Spread %
-data_cleaned = data[['Close']]  # Retain only 'Close' column
-data_cleaned['MA20'] = data_cleaned['Close'].rolling(window=20).mean()  # Calculate MA20
-data_cleaned['MA50'] = data_cleaned['Close'].rolling(window=50).mean()  # Calculate MA50
+# -----------------------------
+# Calculations
+if 'Close' in data.columns:
+    data['MA20'] = data['Close'].rolling(window=20).mean()
+    data['MA50'] = data['Close'].rolling(window=50).mean()
 
-# Calculate Spread% only when MA20, MA50, and Close have valid data
-data_cleaned['Spread%'] = None  # Initialize column with None
+    # Drop rows where any required column is NaN
+    data = data.dropna(subset=['MA20', 'MA50', 'Close'])
 
-for i in range(50, len(data_cleaned)):  # Starting at 50 since we need at least 50 data points for MA50
-    if pd.notna(data_cleaned.loc[i, 'MA20']) and pd.notna(data_cleaned.loc[i, 'MA50']) and pd.notna(data_cleaned.loc[i, 'Close']):
-        data_cleaned.loc[i, 'Spread%'] = ((data_cleaned.loc[i, 'MA20'] - data_cleaned.loc[i, 'MA50']) / data_cleaned.loc[i, 'Close']) * 100
-
-# Drop rows with NaN values in the 'Close', 'MA20', 'MA50', or 'Spread%' columns
-data_cleaned = data_cleaned.dropna(subset=['Close', 'MA20', 'MA50', 'Spread%'])
-
-# Check if data is fetched and contains 'Close'
-if data_cleaned.empty or 'Close' not in data_cleaned.columns:
-    st.warning(f"No valid price data returned for {ticker}. It may be unavailable on Yahoo Finance.")
-    st.stop()
-
-# Display the cleaned data with MA20, MA50, and Spread% as a table
-st.write("Telstra Closing Prices, MA20, MA50 & Spread% (Last 90 Days):", data_cleaned)
+    # -----------------------------
+    # Display Table
+    st.subheader(f"{selected_label} - Closing Price, MA20 & MA50 (Last 180 Days)")
+    st.dataframe(data[['Close', 'MA20', 'MA50']].tail(180))
+else:
+    st.warning("No 'Close' price data available for the selected stock.")
