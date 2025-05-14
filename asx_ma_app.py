@@ -23,9 +23,9 @@ data_cleaned['MA50'] = data_cleaned['Close'].rolling(window=50).mean()  # Calcul
 # Calculate Spread% only when MA20, MA50, and Close have valid data
 data_cleaned['Spread%'] = None  # Initialize column with None
 
-for i in range(50, len(data_cleaned)):
-    if pd.notna(data_cleaned['MA20'].iloc[i]) and pd.notna(data_cleaned['MA50'].iloc[i]) and pd.notna(data_cleaned['Close'].iloc[i]):
-        data_cleaned['Spread%'].iloc[i] = ((data_cleaned['MA20'].iloc[i] - data_cleaned['MA50'].iloc[i]) / data_cleaned['Close'].iloc[i]) * 100
+for i in range(50, len(data_cleaned)):  # Starting at 50 since we need at least 50 data points for MA50
+    if pd.notna(data_cleaned.loc[i, 'MA20']) and pd.notna(data_cleaned.loc[i, 'MA50']) and pd.notna(data_cleaned.loc[i, 'Close']):
+        data_cleaned.loc[i, 'Spread%'] = ((data_cleaned.loc[i, 'MA20'] - data_cleaned.loc[i, 'MA50']) / data_cleaned.loc[i, 'Close']) * 100
 
 # Drop rows with NaN values in the 'Close', 'MA20', 'MA50', or 'Spread%' columns
 data_cleaned = data_cleaned.dropna(subset=['Close', 'MA20', 'MA50', 'Spread%'])
