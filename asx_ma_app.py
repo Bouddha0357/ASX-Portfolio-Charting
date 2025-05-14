@@ -7,33 +7,33 @@ import pandas as pd
 st.set_page_config(page_title="Stock Closing Price, MA20 & MA50 Table", layout="wide", page_icon="📈")
 st.title("📈 Stock Closing Prices, MA20 & MA50 for the Last 180 Days")
 st.markdown("""
-This app displays the closing price, the 20-day moving average (MA20), the 50-day moving average (MA50), and the difference (MA20 - MA50) divided by the closing price for different stocks. You can select a stock from the dropdown menu.
+This app fetches closing price, 20-day moving average (MA20), and 50-day moving average (MA50) for multiple stocks. You can download the data for each selected stock as a separate CSV file.
 """)
 
 # -----------------------------
-# Dropdown for Ticker Selection
-ticker = st.selectbox(
-    "Select Stock:",
-    ("TLS.AX", "BBOZ.AX", "APX.AX", "DRO.AX")  # Available tickers
-)
+# List of Tickers
+tickers = ["TLS.AX", "BBOZ.AX", "APX.AX", "DRO.AX"]
 
-# -----------------------------
-# Data Fetching
-data = yf.download(ticker, period="180d")  # Fetch the past 180 days of data
-
-# Clean up: Retain only 'Close' column and compute MA20 and MA50
-data_cleaned = data[['Close']]  # Retain only 'Close' column
-data_cleaned['MA20'] = data_cleaned['Close'].rolling(window=20).mean()  # Calculate MA20
-data_cleaned['MA50'] = data_cleaned['Close'].rolling(window=50).mean()  # Calculate MA50
-
-# Calculate (MA20 - MA50) / Closing Price, and set the first 50 rows to NaN (since MA50 starts at day 50)
-data_cleaned['Spread'] = (data_cleaned['MA20'] - data_cleaned['MA50'])
-data_cleaned['Spread'][:50] = pd.NA  # Set the first 50 rows to NaN (since MA50 is not available for the first 50 days)
-
-# Check if data is fetched and contains 'Close'
-if data_cleaned.empty or 'Close' not in data_cleaned.columns:
-    st.warning(f"No valid price data returned for {ticker}. It may be unavailable on Yahoo Finance.")
-    st.stop()
-
-# Display the cleaned data with MA20, MA50, and MA20 - MA50 as a table
-st.write(f"Data for {ticker}: Closing Prices, MA20, MA50, and (MA20 - MA50) (Last 180 Days):", data_cleaned)
+# Loop through each ticker to fetch data and add download buttons
+for ticker in tickers:
+    # Fetch the past 180 days of data for each ticker
+    data = yf.download(ticker, period="180d")  
+    
+    # Clean up: Retain only 'Close' column and compute MA20 and MA50
+    data_cleaned = data[['Close']]  # Retain only 'Close' column
+    data_cleaned['MA20'] = data_cleaned['Close'].rolling(window=20).mean()  # Calculate MA20
+    data_cleaned['MA50'] = data_cleaned['Close'].rolling(window=50).mean()  # Calculate MA50
+    
+    # Add the ticker symbol as a column
+    data_cleaned['Ticker'] = ticker
+    
+    # Convert the DataFrame to CSV format
+    csv_data = data_cleaned.to_csv(index=True)  # Convert data to CSV format
+    
+    # Add a download button for each stock's CSV
+    st.download_button(
+        label=f"Download {ticker} CSV",
+        data=csv_data,
+        file_name=f"{ticker}_data.csv",
+        mime="text/csv"
+    )
