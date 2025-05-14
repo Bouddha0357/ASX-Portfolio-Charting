@@ -19,7 +19,12 @@ data = yf.download(ticker, period="180d")  # Fetch the past 180 days of data
 data_cleaned = data[['Close']]  # Retain only 'Close' column
 data_cleaned['MA20'] = data_cleaned['Close'].rolling(window=20).mean()  # Calculate MA20
 data_cleaned['MA50'] = data_cleaned['Close'].rolling(window=50).mean()  # Calculate MA50
-data_cleaned['(MA20 - MA50) / Close'] = (data_cleaned['MA20'] - data_cleaned['MA50']) / data_cleaned['Close']  # Calculate (MA20 - MA50) / Close
+
+# Fill NaN values with 0 (or you can use forward-fill or back-fill if preferred)
+data_cleaned = data_cleaned.fillna(0)  # Replace NaN values with 0
+
+# Calculate (MA20 - MA50) / Close
+data_cleaned['(MA20 - MA50) / Close'] = (data_cleaned['MA20'] - data_cleaned['MA50']) / data_cleaned['Close']
 
 # Check if data is fetched and contains 'Close'
 if data_cleaned.empty or 'Close' not in data_cleaned.columns:
