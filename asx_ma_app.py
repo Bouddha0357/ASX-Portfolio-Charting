@@ -6,7 +6,7 @@ import io
 # -----------------------------
 # Config
 st.set_page_config(page_title="ASX Emerging Companies Stock Data Downloader", layout="wide", page_icon="📈")
-st.title("📈 ASX Emerging Companies Stock Data Downloader - Closing Price, MA20 & MA50 (Last 180 Days)")
+st.title("📈 Portfolio Stock Data Downloader - Closing Price, MA20 & MA50 (Last 180 Days)")
 
 # -----------------------------
 # ASX Ticker List (from your screenshot)
@@ -49,7 +49,7 @@ if all_data:
     st.download_button(
         label="📥 Download Combined CSV for All Stocks",
         data=csv_buffer.getvalue(),
-        file_name="asx_buyback_data.csv",
+        file_name="asx_portfolio_data.csv",
         mime="text/csv"
     )
 else:
