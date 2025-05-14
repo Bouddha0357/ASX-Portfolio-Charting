@@ -20,10 +20,14 @@ data_cleaned = data[['Close']]  # Retain only 'Close' column
 data_cleaned['MA20'] = data_cleaned['Close'].rolling(window=20).mean()  # Calculate MA20
 data_cleaned['MA50'] = data_cleaned['Close'].rolling(window=50).mean()  # Calculate MA50
 
+# Calculate (MA20 - MA50) / Closing Price, and set the first 50 rows to NaN (since MA50 starts at day 50)
+data_cleaned['Spread'] = (data_cleaned['MA20'] - data_cleaned['MA50'])
+data_cleaned['Spread'][:50] = pd.NA  # Set the first 50 rows to NaN (since MA50 is not available for the first 50 days)
+
 # Check if data is fetched and contains 'Close'
 if data_cleaned.empty or 'Close' not in data_cleaned.columns:
     st.warning(f"No valid price data returned for {ticker}. It may be unavailable on Yahoo Finance.")
     st.stop()
 
-# Display the cleaned data with MA20, MA50, and MA20 - MA50 / Closing Price as a table
-st.write("Telstra Closing Prices, MA20, MA50, and (MA20 - MA50) / Closing Price (Last 180 Days):", data_cleaned)
+# Display the cleaned data with MA20, MA50, and MA20 - MA50 as a table
+st.write("Telstra Closing Prices, MA20, MA50, and (MA20 - MA50) (Last 180 Days):", data_cleaned)
