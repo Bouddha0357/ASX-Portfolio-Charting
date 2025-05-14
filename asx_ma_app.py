@@ -33,36 +33,41 @@ data = data.tail(90 + 50)  # Ensure room for MA50 to appear
 
 # -----------------------------
 # Calculations
-data['MA20'] = data['Close'].rolling(window=20).mean()
-data['MA50'] = data['Close'].rolling(window=50).mean()
-data = data.dropna(subset=['MA50'])  # Ensure MA50 exists (and by then MA20 does too)
-data['SpreadPct'] = ((data['MA20'] - data['MA50']) / data['Close']) * 100
+if 'Close' in data.columns:
+    data['MA20'] = data['Close'].rolling(window=20).mean()
+    data['MA50'] = data['Close'].rolling(window=50).mean()
 
+    # Drop rows until MA50 is available
+    data = data.dropna(subset=['MA20', 'MA50', 'Close'])
 
-# -----------------------------
-# Plotly Chart
-fig = go.Figure()
+    data['SpreadPct'] = ((data['MA20'] - data['MA50']) / data['Close']) * 100
 
-# Price
-fig.add_trace(go.Scatter(x=data.index, y=data['Close'], mode='lines', name='Price', line=dict(color='lightblue')))
+    # -----------------------------
+    # Plotly Chart
+    fig = go.Figure()
 
-# MA20 & MA50
-fig.add_trace(go.Scatter(x=data.index, y=data['MA20'], mode='lines', name='MA20', line=dict(color='orange')))
-fig.add_trace(go.Scatter(x=data.index, y=data['MA50'], mode='lines', name='MA50', line=dict(color='green')))
+    # Price
+    fig.add_trace(go.Scatter(x=data.index, y=data['Close'], mode='lines', name='Price', line=dict(color='lightblue')))
 
-# Spread % on secondary y-axis
-fig.add_trace(go.Scatter(x=data.index, y=data['SpreadPct'], mode='lines', name='Spread % (MA20 - MA50)', yaxis='y2', line=dict(color='red', dash='dot')))
+    # MA20 & MA50
+    fig.add_trace(go.Scatter(x=data.index, y=data['MA20'], mode='lines', name='MA20', line=dict(color='orange')))
+    fig.add_trace(go.Scatter(x=data.index, y=data['MA50'], mode='lines', name='MA50', line=dict(color='green')))
 
-# Layout
-fig.update_layout(
-    template='plotly_dark',
-    title=f"{selected_label} - Price, MA20, MA50 & Spread %",
-    xaxis=dict(title='Date'),
-    yaxis=dict(title='Price'),
-    yaxis2=dict(title='Spread %', overlaying='y', side='right'),
-    legend=dict(x=0, y=1.2, orientation='h')
-)
+    # Spread % on secondary y-axis
+    fig.add_trace(go.Scatter(x=data.index, y=data['SpreadPct'], mode='lines', name='Spread % (MA20 - MA50)', yaxis='y2', line=dict(color='red', dash='dot')))
 
-# -----------------------------
-# Display Chart
-st.plotly_chart(fig, use_container_width=True)
+    # Layout
+    fig.update_layout(
+        template='plotly_dark',
+        title=f"{selected_label} - Price, MA20, MA50 & Spread %",
+        xaxis=dict(title='Date'),
+        yaxis=dict(title='Price'),
+        yaxis2=dict(title='Spread %', overlaying='y', side='right'),
+        legend=dict(x=0, y=1.2, orientation='h')
+    )
+
+    # -----------------------------
+    # Display Chart
+    st.plotly_chart(fig, use_container_width=True)
+else:
+    st.warning("No 'Close' price data available for the selected stock.")
