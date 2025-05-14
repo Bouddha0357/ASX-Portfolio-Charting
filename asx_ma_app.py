@@ -20,10 +20,14 @@ data_cleaned = data[['Close']]  # Retain only 'Close' column
 data_cleaned['MA20'] = data_cleaned['Close'].rolling(window=20).mean()  # Calculate MA20
 data_cleaned['MA50'] = data_cleaned['Close'].rolling(window=50).mean()  # Calculate MA50
 
-# Handle NaN values in MA20, MA50, or Close before calculating Spread %
-data_cleaned['Spread%'] = ((data_cleaned['MA20'] - data_cleaned['MA50']) / data_cleaned['Close']) * 100
+# Calculate Spread% only when MA20, MA50, and Close have valid data
+data_cleaned['Spread%'] = None  # Initialize column with None
 
-# Remove rows with NaN values in MA20, MA50, or Spread%
+for i in range(50, len(data_cleaned)):
+    if pd.notna(data_cleaned['MA20'].iloc[i]) and pd.notna(data_cleaned['MA50'].iloc[i]) and pd.notna(data_cleaned['Close'].iloc[i]):
+        data_cleaned['Spread%'].iloc[i] = ((data_cleaned['MA20'].iloc[i] - data_cleaned['MA50'].iloc[i]) / data_cleaned['Close'].iloc[i]) * 100
+
+# Drop rows with NaN values in the 'Close', 'MA20', 'MA50', or 'Spread%' columns
 data_cleaned = data_cleaned.dropna(subset=['Close', 'MA20', 'MA50', 'Spread%'])
 
 # Check if data is fetched and contains 'Close'
