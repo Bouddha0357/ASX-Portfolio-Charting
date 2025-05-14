@@ -3,53 +3,34 @@ import yfinance as yf
 import pandas as pd
 
 # -----------------------------
+
 # Config
-st.set_page_config(page_title="ASX Stock MA Viewer", layout="wide", page_icon="📈")
-st.title("📈 ASX Stock MA Analysis")
+
+st.set\_page\_config(page\_title="Telstra Closing Price, MA20 & MA50 Table", layout="wide", page\_icon="📈")
+st.title("📈 Telstra (TLS.AX) - Closing Price, MA20 & MA50 for the Last 180 Days")
 st.markdown("""
-This app shows the last 180 trading days of a selected ASX stock with:
-- Closing Price
-- MA20 & MA50
+This app displays the closing price, the 20-day moving average (MA20), and the 50-day moving average (MA50) of Telstra (TLS.AX) for the last 180 trading days in a table format.
 """)
 
 # -----------------------------
-# Dropdown
-stock_map = {
-    "Telstra (TLS)": "TLS.AX",
-    "BBOZ": "BBOZ.AX",
-    "Appen (APX)": "APX.AX",
-    "DroneShield (DRO)": "DRO.AX"
-}
 
-selected_label = st.selectbox("Select ASX Stock:", list(stock_map.keys()))
-ticker = stock_map[selected_label]
-
-# -----------------------------
 # Data Fetching
-data = yf.download(ticker, period="9mo")  # Ensure enough data for 180 days
 
-# -----------------------------
-# Calculations
-required_cols = ['Close']
-if all(col in data.columns for col in required_cols):
-    data['MA20'] = data['Close'].rolling(window=20).mean()
-    data['MA50'] = data['Close'].rolling(window=50).mean()
+ticker = "TLS.AX"
+data = yf.download(ticker, period="180d")  # Fetch the past 180 days of data
 
-    # Determine available columns and drop rows only where all exist
-    available_cols = ['Close']
-    if 'MA20' in data.columns:
-        available_cols.append('MA20')
-    if 'MA50' in data.columns:
-        available_cols.append('MA50')
+# Clean up: Retain only 'Close' column and compute MA20 and MA50
 
-    data = data.dropna(subset=available_cols)
+data\_cleaned = data\[\['Close']]  # Retain only 'Close' column
+data\_cleaned\['MA20'] = data\_cleaned\['Close'].rolling(window=20).mean()  # Calculate MA20
+data\_cleaned\['MA50'] = data\_cleaned\['Close'].rolling(window=50).mean()  # Calculate MA50
 
-    if not data.empty and all(col in data.columns for col in ['Close', 'MA20', 'MA50']):
-        # -----------------------------
-        # Display Table
-        st.subheader(f"{selected_label} - Closing Price, MA20 & MA50 (Last 180 Days)")
-        st.dataframe(data[['Close', 'MA20', 'MA50']].tail(180))
-    else:
-        st.warning("Not enough data available to compute MA20 and MA50.")
-else:
-    st.warning("No 'Close' price data available for the selected stock.")
+# Check if data is fetched and contains 'Close'
+
+if data\_cleaned.empty or 'Close' not in data\_cleaned.columns:
+st.warning(f"No valid price data returned for {ticker}. It may be unavailable on Yahoo Finance.")
+st.stop()
+
+# Display the cleaned data with MA20 and MA50 as a table
+
+st.write("Telstra Closing Prices, MA20 & MA50 (Last 180 Days):", data\_cleaned)
