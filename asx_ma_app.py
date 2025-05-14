@@ -38,33 +38,43 @@ if data.empty or 'Close' not in data.columns:
 
 # -----------------------------
 # Calculations
- if data.empty:
-        st.warning("No data available from CoinGecko.")
-        st.stop()
+if data.empty:
+    st.warning("No data available from Yahoo Finance.")
+    st.stop()
 
-    data["MA20"] = data["price"].rolling(window=20).mean()
-    data["MA50"] = data["price"].rolling(window=50).mean()
-    data["Spread %"] = (data["MA20"] - data["MA50"]) / data["price"] * 100
+data["MA20"] = data["Close"].rolling(window=20).mean()
+data["MA50"] = data["Close"].rolling(window=50).mean()
+data["Spread %"] = (data["MA20"] - data["MA50"]) / data["Close"] * 100
 
-    data_filtered = data.dropna(subset=["MA50"])
-    if data_filtered.empty:
-        st.warning("Not enough data available to calculate MA50.")
-        st.stop()
+data_filtered = data.dropna(subset=["MA50"])
+if data_filtered.empty:
+    st.warning("Not enough data available to calculate MA50.")
+    st.stop()
 
-    fig, ax1 = plt.subplots(figsize=(12, 6))
+# -----------------------------
+# Plotly Chart
+fig = go.Figure()
 
-    ax1.plot(data_filtered.index, data_filtered["price"], label="Price", color="white")
-    ax1.plot(data_filtered.index, data_filtered["MA20"], label="MA20", color="yellow")
-    ax1.plot(data_filtered.index, data_filtered["MA50"], label="MA50", color="blue")
-    ax1.set_ylabel("Price (USD)")
-    ax1.legend(loc="upper left")
-    ax1.set_title(f"{selected_coin_name} – Daily Chart (Last 180 Days, Starting After MA50)", color='white')
+# Price
+fig.add_trace(go.Scatter(x=data_filtered.index, y=data_filtered["Close"], mode='lines', name="Price", line=dict(color="lightblue")))
 
-    ax2 = ax1.twinx()
-    ax2.plot(data_filtered.index, data_filtered["Spread %"], label="Spread %", color="green", linestyle="dashed")
-    ax2.set_ylabel("Spread %")
-    ax2.legend(loc="upper right")
+# MA20 & MA50
+fig.add_trace(go.Scatter(x=data_filtered.index, y=data_filtered["MA20"], mode='lines', name="MA20", line=dict(color="orange")))
+fig.add_trace(go.Scatter(x=data_filtered.index, y=data_filtered["MA50"], mode='lines', name="MA50", line=dict(color="green")))
 
-    st.pyplot(fig)
-else:
-    st.write("Select a cryptocurrency and click 'Fetch Data' to display the chart.")
+# Spread % on secondary y-axis
+fig.add_trace(go.Scatter(x=data_filtered.index, y=data_filtered["Spread %"], mode='lines', name="Spread %", yaxis="y2", line=dict(color="red", dash="dot")))
+
+# Layout
+fig.update_layout(
+    template="plotly_dark",
+    title=f"{selected_label} - Price, MA20, MA50 & Spread %",
+    xaxis=dict(title="Date"),
+    yaxis=dict(title="Price"),
+    yaxis2=dict(title="Spread %", overlaying="y", side="right"),
+    legend=dict(x=0, y=1.2, orientation="h")
+)
+
+# -----------------------------
+# Display Chart
+st.plotly_chart(fig, use_container_width=True)
