@@ -4,15 +4,21 @@ import pandas as pd
 
 # -----------------------------
 # Config
-st.set_page_config(page_title="Telstra Closing Price, MA20 & MA50 Table", layout="wide", page_icon="📈")
-st.title("📈 Telstra (TLS.AX) - Closing Price, MA20 & MA50 for the Last 180 Days")
+st.set_page_config(page_title="Stock Closing Price, MA20 & MA50 Table", layout="wide", page_icon="📈")
+st.title("📈 Stock Closing Prices, MA20 & MA50 for the Last 180 Days")
 st.markdown("""
-This app displays the closing price, the 20-day moving average (MA20), the 50-day moving average (MA50), and the difference (MA20 - MA50) divided by the closing price of Telstra (TLS.AX) for the last 180 trading days in a table format.
+This app displays the closing price, the 20-day moving average (MA20), the 50-day moving average (MA50), and the difference (MA20 - MA50) divided by the closing price for different stocks. You can select a stock from the dropdown menu.
 """)
 
 # -----------------------------
+# Dropdown for Ticker Selection
+ticker = st.selectbox(
+    "Select Stock:",
+    ("TLS.AX", "BBOZ.AX", "APX.AX", "DRO.AX")  # Available tickers
+)
+
+# -----------------------------
 # Data Fetching
-ticker = "TLS.AX"
 data = yf.download(ticker, period="180d")  # Fetch the past 180 days of data
 
 # Clean up: Retain only 'Close' column and compute MA20 and MA50
@@ -30,4 +36,4 @@ if data_cleaned.empty or 'Close' not in data_cleaned.columns:
     st.stop()
 
 # Display the cleaned data with MA20, MA50, and MA20 - MA50 as a table
-st.write("Telstra Closing Prices, MA20, MA50, and (MA20 - MA50) (Last 180 Days):", data_cleaned)
+st.write(f"Data for {ticker}: Closing Prices, MA20, MA50, and (MA20 - MA50) (Last 180 Days):", data_cleaned)
