@@ -1,14 +1,13 @@
 import streamlit as st
 import yfinance as yf
-import pandas as pd
 import plotly.graph_objects as go
 
 # -----------------------------
 # Config
-st.set_page_config(page_title="Telstra MA50 Chart", layout="wide", page_icon="📈")
-st.title("📈 Telstra (TLS.AX) MA50 Analysis")
+st.set_page_config(page_title="Telstra Closing Price Chart", layout="wide", page_icon="📈")
+st.title("📈 Telstra (TLS.AX) - Closing Price for the Last 90 Days")
 st.markdown("""
-This app fetches the 50-day moving average (MA50) of Telstra (TLS.AX) for the past 90 days and displays it on a chart.
+This app displays the closing price of Telstra (TLS.AX) for the last 90 trading days.
 """)
 
 # -----------------------------
@@ -22,25 +21,18 @@ if data.empty or 'Close' not in data.columns:
     st.stop()
 
 # -----------------------------
-# Calculate MA50
-data["MA50"] = data["Close"].rolling(window=50).mean()
-
-# -----------------------------
-# Plotly Chart
+# Plotly Chart - Closing Price
 fig = go.Figure()
 
-# Price
-fig.add_trace(go.Scatter(x=data.index, y=data["Close"], mode='lines', name="Price", line=dict(color="lightblue")))
-
-# MA50
-fig.add_trace(go.Scatter(x=data.index, y=data["MA50"], mode='lines', name="MA50", line=dict(color="orange")))
+# Closing Price
+fig.add_trace(go.Scatter(x=data.index, y=data["Close"], mode='lines', name="Closing Price", line=dict(color="lightblue")))
 
 # Layout
 fig.update_layout(
     template="plotly_dark",
-    title="Telstra (TLS.AX) - 50-day Moving Average (MA50)",
+    title="Telstra (TLS.AX) - Closing Price (Last 90 Days)",
     xaxis=dict(title="Date"),
-    yaxis=dict(title="Price"),
+    yaxis=dict(title="Closing Price (AUD)"),
     legend=dict(x=0, y=1.2, orientation="h")
 )
 
