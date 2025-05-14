@@ -29,8 +29,8 @@ if data_cleaned.empty or 'Close' not in data_cleaned.columns:
     st.warning(f"No valid price data returned for {ticker}. It may be unavailable on Yahoo Finance.")
     st.stop()
 
-# Format the last column as percentage
+# Format the last column as a percentage with 2 decimal places
 data_cleaned['MA20 - MA50 / Close (%)'] = data_cleaned['MA20 - MA50 / Close (%)'].apply(lambda x: f"{x:.2f}%" if pd.notna(x) else "")
 
-# Display the cleaned data with formatted percentage column
+# Display the cleaned data as a dataframe
 st.dataframe(data_cleaned)
