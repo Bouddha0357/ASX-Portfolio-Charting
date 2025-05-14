@@ -21,16 +21,16 @@ data_cleaned['MA20'] = data_cleaned['Close'].rolling(window=20).mean()  # Calcul
 data_cleaned['MA50'] = data_cleaned['Close'].rolling(window=50).mean()  # Calculate MA50
 
 # Calculate ((MA20 - MA50) / Closing Price) * 100 to get the percentage, and set the first 50 rows to NaN
-data_cleaned['MA20 - MA50 / Close (%)'] = ((data_cleaned['MA20'] - data_cleaned['MA50']) / data_cleaned['Close']) * 100
-data_cleaned['MA20 - MA50 / Close (%)'][:50] = pd.NA  # Set the first 50 rows to NaN
+data_cleaned['Spread %'] = ((data_cleaned['MA20'] - data_cleaned['MA50']) / data_cleaned['Close']) * 100
+data_cleaned['Spread %'][:50] = pd.NA  # Set the first 50 rows to NaN
 
 # Check if data is fetched and contains 'Close'
 if data_cleaned.empty or 'Close' not in data_cleaned.columns:
     st.warning(f"No valid price data returned for {ticker}. It may be unavailable on Yahoo Finance.")
     st.stop()
 
-# Format the last column as a percentage with 2 decimal places
-data_cleaned['MA20 - MA50 / Close (%)'] = data_cleaned['MA20 - MA50 / Close (%)'].apply(lambda x: f"{x:.2f}%" if pd.notna(x) else "")
+# Format the 'Spread %' column as a percentage with 2 decimal places
+data_cleaned['Spread %'] = data_cleaned['Spread %'].apply(lambda x: f"{x:.2f}%" if pd.notna(x) else "")
 
 # Display the cleaned data as a dataframe
 st.dataframe(data_cleaned)
