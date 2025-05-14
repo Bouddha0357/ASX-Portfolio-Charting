@@ -1,53 +1,56 @@
 import streamlit as st
 import yfinance as yf
 import pandas as pd
-import zipfile
 import io
 
 # -----------------------------
 # Config
-st.set_page_config(page_title="Stock Closing Price, MA20 & MA50 Table", layout="wide", page_icon="📈")
-st.title("📈 Stock Closing Prices, MA20 & MA50 for the Last 180 Days")
-st.markdown("""
-This app fetches closing price, 20-day moving average (MA20), and 50-day moving average (MA50) for multiple stocks. You can download all selected stocks' data as separate CSV files in a single ZIP file.
-""")
+st.set_page_config(page_title="ASX Emerging Companies Stock Data Downloader", layout="wide", page_icon="📈")
+st.title("📈 ASX Emerging Companies Stock Data Downloader - Closing Price, MA20 & MA50 (Last 180 Days)")
 
 # -----------------------------
-# List of Tickers
-tickers = ["TLS.AX", "BBOZ.AX", "APX.AX", "DRO.AX"]
+# ASX Ticker List (from your screenshot)
+tickers = [
+    "TLS", "BBOZ",  "APX",  "DRO" 
+]
 
-# Create a zip file in memory
-zip_buffer = io.BytesIO()
+# Add ".AX" to each ticker for Yahoo Finance
+tickers = [ticker + ".AX" for ticker in tickers]
 
-# Create a ZIP file object
-with zipfile.ZipFile(zip_buffer, "w", zipfile.ZIP_DEFLATED) as zip_file:
-    # Loop through each ticker to fetch data and add to ZIP
+# Combined DataFrame
+all_data = []
+
+# -----------------------------
+# Fetch and process data
+with st.spinner("Fetching data, please wait..."):
     for ticker in tickers:
-        # Fetch the past 180 days of data for each ticker
-        data = yf.download(ticker, period="180d")  
-        
-        # Clean up: Retain only 'Close' column and compute MA20 and MA50
-        data_cleaned = data[['Close']]  # Retain only 'Close' column
-        data_cleaned['MA20'] = data_cleaned['Close'].rolling(window=20).mean()  # Calculate MA20
-        data_cleaned['MA50'] = data_cleaned['Close'].rolling(window=50).mean()  # Calculate MA50
-        
-        # Add the ticker symbol as a column
-        data_cleaned['Ticker'] = ticker
-        
-        # Convert the DataFrame to CSV format
-        csv_data = data_cleaned.to_csv(index=True)  # Convert data to CSV format
-        
-        # Add the CSV to the ZIP file with the stock's ticker as the file name
-        zip_file.writestr(f"{ticker}_data.csv", csv_data)
+        try:
+            data = yf.download(ticker, period="180d", progress=False)
+            if data.empty or 'Close' not in data.columns:
+                continue
+            
+            # Create a new DataFrame with just the 'Close' column
+            data_cleaned = pd.DataFrame()
+            data_cleaned['Close'] = data['Close']
+            data_cleaned['MA20'] = data_cleaned['Close'].rolling(window=20).mean()
+            data_cleaned['MA50'] = data_cleaned['Close'].rolling(window=50).mean()
+            data_cleaned['Ticker'] = ticker.replace(".AX", "")
+            data_cleaned.reset_index(inplace=True)
+            all_data.append(data_cleaned)
 
-# Move the pointer to the start of the ZIP buffer before sending it for download
-zip_buffer.seek(0)
+        except Exception as e:
+            st.warning(f"Failed to fetch data for {ticker}: {e}")
 
-# -----------------------------
-# Add a single download button for the ZIP file
-st.download_button(
-    label="Download All Stocks as ZIP",
-    data=zip_buffer,
-    file_name="all_stocks_data.zip",
-    mime="application/zip"
-)
+# Combine all into one CSV
+if all_data:
+    combined_df = pd.concat(all_data, ignore_index=True)
+    csv_buffer = io.StringIO()
+    combined_df.to_csv(csv_buffer, index=False)
+    st.download_button(
+        label="📥 Download Combined CSV for All Stocks",
+        data=csv_buffer.getvalue(),
+        file_name="asx_buyback_data.csv",
+        mime="text/csv"
+    )
+else:
+    st.error("No data was fetched. Please try again later or check ticker symbols.")
