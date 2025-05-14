@@ -7,13 +7,13 @@ import pandas as pd
 st.set_page_config(page_title="Telstra Closing Price, MA20 & MA50 Table", layout="wide", page_icon="📈")
 st.title("📈 Telstra (TLS.AX) - Closing Price, MA20 & MA50 for the Last 90 Days")
 st.markdown("""
-This app displays the closing price, the 20-day moving average (MA20), and the 50-day moving average (MA50) of Telstra (TLS.AX) for the last 90 trading days in a table format.
+This app displays the closing price, the 20-day moving average (MA20), and the 50-day moving average (MA50) of Telstra (TLS.AX) for the last 180 trading days in a table format.
 """)
 
 # -----------------------------
 # Data Fetching
 ticker = "TLS.AX"
-data = yf.download(ticker, period="90d")  # Fetch the past 90 days of data
+data = yf.download(ticker, period="180d")  # Fetch the past 180 days of data
 
 # Clean up: Retain only 'Close' column and compute MA20 and MA50
 data_cleaned = data[['Close']]  # Retain only 'Close' column
@@ -26,4 +26,4 @@ if data_cleaned.empty or 'Close' not in data_cleaned.columns:
     st.stop()
 
 # Display the cleaned data with MA20 and MA50 as a table
-st.write("Telstra Closing Prices, MA20 & MA50 (Last 90 Days):", data_cleaned)
+st.write("Telstra Closing Prices, MA20 & MA50 (Last 180 Days):", data_cleaned)
