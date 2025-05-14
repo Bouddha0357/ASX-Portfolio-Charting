@@ -41,22 +41,40 @@ if data.empty or 'Close' not in data.columns:
 data['MA20'] = data['Close'].rolling(window=20).mean()
 data['MA50'] = data['Close'].rolling(window=50).mean()
 
-# Drop rows where any required column is NaN
-data = data.dropna(subset=['MA20', 'MA50', 'Close'])
+# Check if required columns exist after calculations
+if 'MA20' in data.columns and 'MA50' in data.columns and 'Close' in data.columns:
+    # Drop rows where any required column is NaN
+    data = data.dropna(subset=['MA20', 'MA50', 'Close'])
 
-# Compute SpreadPct
-data['SpreadPct'] = ((data['MA20'] - data['MA50']) / data['Close']) * 100
+    # Compute SpreadPct
+    data['SpreadPct'] = ((data['MA20'] - data['MA50']) / data['Close']) * 100
 
-# -----------------------------
-# Plotly Chart
-fig = go.Figure()
+    # -----------------------------
+    # Plotly Chart
+    fig = go.Figure()
 
-# Price
-fig.add_trace(go.Scatter(x=data.index, y=data['Close'], mode='lines', name='Price', line=dict(color='lightblue')))
+    # Price
+    fig.add_trace(go.Scatter(x=data.index, y=data['Close'], mode='lines', name='Price', line=dict(color='lightblue')))
 
-# MA20 & MA50
-fig.add_trace(go.Scatter(x=data.index, y=data['MA20'], mode='lines', name='MA20', line=dict(color='orange')))
-fig.add_trace(go.Scatter(x=data.index, y=data['MA50'], mode='lines', name='MA50', line=dict(color='green')))
+    # MA20 & MA50
+    fig.add_trace(go.Scatter(x=data.index, y=data['MA20'], mode='lines', name='MA20', line=dict(color='orange')))
+    fig.add_trace(go.Scatter(x=data.index, y=data['MA50'], mode='lines', name='MA50', line=dict(color='green')))
 
-# Spread % on secondary y-axis
-fig.add
+    # Spread % on secondary y-axis
+    fig.add_trace(go.Scatter(x=data.index, y=data['SpreadPct'], mode='lines', name='Spread % (MA20 - MA50)', yaxis='y2', line=dict(color='red', dash='dot')))
+
+    # Layout
+    fig.update_layout(
+        template='plotly_dark',
+        title=f"{selected_label} - Price, MA20, MA50 & Spread %",
+        xaxis=dict(title='Date'),
+        yaxis=dict(title='Price'),
+        yaxis2=dict(title='Spread %', overlaying='y', side='right'),
+        legend=dict(x=0, y=1.2, orientation='h')
+    )
+
+    # -----------------------------
+    # Display Chart
+    st.plotly_chart(fig, use_container_width=True)
+else:
+    st.error("One or more required columns (MA20, MA50, Close) are missing or incomplete.")
