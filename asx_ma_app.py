@@ -1,13 +1,13 @@
 import streamlit as st
 import yfinance as yf
-import plotly.graph_objects as go
+import pandas as pd
 
 # -----------------------------
 # Config
-st.set_page_config(page_title="Telstra Closing Price Chart", layout="wide", page_icon="📈")
+st.set_page_config(page_title="Telstra Closing Price Table", layout="wide", page_icon="📈")
 st.title("📈 Telstra (TLS.AX) - Closing Price for the Last 90 Days")
 st.markdown("""
-This app displays the closing price of Telstra (TLS.AX) for the last 90 trading days.
+This app displays the closing price of Telstra (TLS.AX) for the last 90 trading days in a table format.
 """)
 
 # -----------------------------
@@ -23,27 +23,5 @@ if data_cleaned.empty or 'Close' not in data_cleaned.columns:
     st.warning(f"No valid price data returned for {ticker}. It may be unavailable on Yahoo Finance.")
     st.stop()
 
-# Debugging: Show the cleaned data for verification
-st.write("Cleaned Data (Last 90 Days):", data_cleaned.head())  # Display cleaned data
-
-# -----------------------------
-# Plotly Chart - Closing Price
-fig = go.Figure()
-
-# Closing Price
-fig.add_trace(go.Scatter(x=data_cleaned.index, y=data_cleaned["Close"], mode='lines', name="Closing Price", line=dict(color="lightblue", width=2)))
-
-# Layout
-fig.update_layout(
-    template="plotly_dark",
-    title="Telstra (TLS.AX) - Closing Price (Last 90 Days)",
-    xaxis=dict(title="Date", tickformat="%Y-%m-%d"),  # Format the x-axis to show dates clearly
-    yaxis=dict(title="Closing Price (AUD)"),
-    legend=dict(x=0, y=1.2, orientation="h"),
-    plot_bgcolor="rgba(0,0,0,0)",  # Transparent background for the chart
-    margin=dict(t=40, b=40, l=40, r=40),  # Adjust margins for better spacing
-)
-
-# -----------------------------
-# Display Chart
-st.plotly_chart(fig, use_container_width=True)
+# Display the cleaned data as a table
+st.write("Telstra Closing Prices (Last 90 Days):", data_cleaned)
