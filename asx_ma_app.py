@@ -11,7 +11,7 @@ st.title("📈 Portfolio Stock Data Downloader - Closing Price, MA20 & MA50 (Las
 # -----------------------------
 # ASX Ticker List (from your screenshot)
 tickers = [
-    "TLS", "GEAR",  "APX",  "PLS",  "AXE",  "AL3",  "ALC",  "RFG"
+    "TLS", "GEAR",  "APX",  "SOL",  "AXE",  "AL3",  "ALC",  "RFG"
 ]
 
 # Add ".AX" to each ticker for Yahoo Finance
@@ -54,6 +54,7 @@ if all_data:
     )
 else:
     st.error("No data was fetched. Please try again later or check ticker symbols.")
+
 
 
 
