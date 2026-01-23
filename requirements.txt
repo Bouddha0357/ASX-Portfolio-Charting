@@ -3,3 +3,4 @@ plotly
 streamlit
 yfinance
 altair<5
+standard-imghdr
