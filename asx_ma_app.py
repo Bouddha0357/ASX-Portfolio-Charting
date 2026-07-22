@@ -11,7 +11,7 @@ st.title("📈 Portfolio Stock Data Downloader - Closing Price, MA20 & MA50 (Las
 # -----------------------------
 # ASX Ticker List (from your screenshot)
 tickers = [
-    "AL3",  "ALC",  "HAS",  "VUL",  "AR9",  "FCL",  "IMM",  "PLY"
+    "ALC",  "AR9",  "FCL",  "IMM",  "EVZ"
 ]
 
 # Add ".AX" to each ticker for Yahoo Finance
